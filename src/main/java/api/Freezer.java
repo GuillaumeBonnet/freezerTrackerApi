@@ -11,9 +11,9 @@ import javax.persistence.ManyToMany;
 @Entity
 public class Freezer {
 	private @Id @GeneratedValue Long id;
-	String name;
+	protected String name;
 	@ManyToMany
-	List<Aliment> content;
+	protected List<Aliment> content;
 	
 	private Freezer() { }
 
@@ -23,13 +23,29 @@ public class Freezer {
 		this.content = content;
 	}
 
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
 
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 
+	public List<Aliment> getContent() {
+		return content;
+	}
 
-
-
+	public void setContent(List<Aliment> content) {
+		this.content = content;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
