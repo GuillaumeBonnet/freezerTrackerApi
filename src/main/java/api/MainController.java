@@ -68,11 +68,12 @@ public class MainController {
 		return aliments.save(sourceAliment);
 	}
 	
-	@RequestMapping(path="/aliment/{idAliment}", method=RequestMethod.DELETE, headers="Content-type=application/json")
+	@RequestMapping(path="aliment/{idAliment}", method=RequestMethod.DELETE)
 	@ResponseBody
 	public void deleteAliment(HttpServletRequest request, @PathVariable("idAliment") String idAliment) {
 		Long id = null;
 		id = Long.valueOf(idAliment);
+		System.out.println("delete id:" + id);
 		if (id == null) {
 		}
 		else {
