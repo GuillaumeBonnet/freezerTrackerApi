@@ -16,7 +16,9 @@ import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
 
-@CrossOrigin(origins = "http://localhost:4200")
+
+//@CrossOrigin(origins = "http://localhost:4200/ https://freezer-practice-front.herokuapp.com/")
+@CrossOrigin(origins = "*")
 @Controller
 public class MainController {
 	
