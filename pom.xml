@@ -3,9 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>GuillaumeBonnet</groupId>
 	<artifactId>FreezerTracker</artifactId>
-	<packaging>ejb</packaging>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>FreezerTracker Maven Webapp</name>
+	<version>1.0</version>
+	<name>FreezerTracker</name>
 	<url>http://maven.apache.org</url>	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -20,6 +19,13 @@
 	</properties>
 
 	<dependencies>
+		 <!-- Switch back from Spring Boot standard HikariCP to Tomcat JDBC,
+	    configured later in Heroku (see https://stackoverflow.com/a/49970142/4964553) -->
+	    <dependency>
+	        <groupId>org.apache.tomcat</groupId>
+	        <artifactId>tomcat-jdbc</artifactId>
+	    </dependency>
+	    
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -52,14 +58,32 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+	 	<dependency>
+	      <groupId>org.postgresql</groupId>
+	      <artifactId>postgresql</artifactId>
+	      </dependency>
 	</dependencies>
 	<build>
-		<finalName>FreezerTracker</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+            <configuration>
+              <additionalProperties>
+                <encoding.source>${project.build.sourceEncoding}</encoding.source>
+                <encoding.reporting>${project.reporting.outputEncoding}</encoding.reporting>
+                <java.source>${maven.compiler.source}</java.source>
+                <java.target>${maven.compiler.target}</java.target>
+              </additionalProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -1,0 +1,1 @@
+web: java -jar target/FreezerTracker-1.0.jar

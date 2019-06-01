@@ -39,9 +39,11 @@ public class ApplicationStartup {
 		aliments.save(new Aliment("frites", "fritur", "icon-batch1_fries", 1.0, "kg", null, null));
 		aliments.save(new Aliment("icecream", "desert", "icon-batch1_ice-cream-12", 10.0, "", null, null));
 		Aliment[] tab = {new Aliment(1L), new Aliment(2L), new Aliment(3L)};
-		freezers.save(new Freezer(
-			"my freezer",
-			(List<Aliment>)aliments.findAll()
-		));
+		freezers.save(
+			new Freezer(
+				"my freezer",
+				(List<Aliment>)aliments.findAll()
+			)
+		);
 	}
 }
