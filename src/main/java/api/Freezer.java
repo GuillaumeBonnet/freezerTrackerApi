@@ -1,16 +1,11 @@
 package api;
 
-import java.sql.Date;
 import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Entity;
 
 @Entity
-public class Freezer {
-	private @Id @GeneratedValue Long id;
+public class Freezer extends EntityRoot {
 	protected String name;
 	@ManyToMany
 	protected List<Aliment> content;
@@ -21,14 +16,6 @@ public class Freezer {
 		super();
 		this.name = name;
 		this.content = content;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getName() {
@@ -54,7 +41,7 @@ public class Freezer {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Freezer [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", name=");
 		builder.append(name);
 		builder.append(", content=");

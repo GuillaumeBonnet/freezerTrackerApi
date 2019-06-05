@@ -1,15 +1,12 @@
 package api;
 
-import java.sql.Date;
 
+import java.sql.Date;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 
 @Entity
-public class Aliment {
+public class Aliment extends EntityRoot {
 
-	private @Id @GeneratedValue Long id;
 	private String name;
 	private String category;
 	private String iconicFontName;
@@ -64,13 +61,6 @@ public class Aliment {
 		return builder.toString();
 	}
 
-	/** Getters for id
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-
 	/** Getters for name
 	 * @return the name
 	 */
@@ -118,13 +108,6 @@ public class Aliment {
 	 */
 	public Date getExpirationDate() {
 		return expirationDate;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	/**
