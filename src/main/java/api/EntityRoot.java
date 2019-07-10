@@ -20,16 +20,17 @@ import org.hibernate.annotations.GenerationTime;
 @MappedSuperclass  
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) 
 public abstract class EntityRoot {
-	@Id @GeneratedValue
+	@Id @GeneratedValue @Column(name="id")
 	protected Long id;
 	
     @Generated(value = GenerationTime.INSERT)
     @Temporal(value=TemporalType.TIMESTAMP)
-    @Column(name="creationTimestamp", insertable=false)
+    @Column(name="creation_timestamp")
     protected Date creationTimestamp;
 
     @Generated(value = GenerationTime.ALWAYS)
-    @Temporal(value=TemporalType.TIMESTAMP)
+	@Temporal(value=TemporalType.TIMESTAMP)
+	@Column(name="update_timestamp")
     protected Date updateTimestamp;
 
     public Date getCreationTimestamp() {
@@ -51,6 +52,13 @@ public abstract class EntityRoot {
 	 */
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	//used in toString() of sub classes
+	@Override
+	public String toString() {
+		return "id=" + id + ", creationTimestamp=" + creationTimestamp + ", updateTimestamp="
+				+ updateTimestamp;
 	}
 
 }

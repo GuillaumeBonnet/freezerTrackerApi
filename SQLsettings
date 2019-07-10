@@ -1,0 +1,92 @@
+-- FUNCTION: public.insert_ts_func()
+
+-- DROP FUNCTION public.insert_ts_func();
+
+CREATE FUNCTION public.insert_ts_func()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF 
+AS $BODY$
+BEGIN
+    NEW.creation_timestamp = now();
+    NEW.update_timestamp = NEW.creation_timestamp;
+	RETURN NEW;
+END;
+$BODY$;
+
+ALTER FUNCTION public.insert_ts_func()
+    OWNER TO xakqxrognahxgw;
+
+
+
+
+-- FUNCTION: public.update_ts_func()
+
+-- DROP FUNCTION public.update_ts_func();
+
+CREATE FUNCTION public.update_ts_func()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF 
+AS $BODY$
+BEGIN
+    NEW.update_timestamp = NOW();
+	RETURN NEW;
+END;
+$BODY$;
+
+ALTER FUNCTION public.update_ts_func()
+    OWNER TO xakqxrognahxgw;
+
+
+
+-- Trigger: beforeInsertAliment
+
+-- DROP TRIGGER "beforeInsertAliment" ON public.aliment;
+
+CREATE TRIGGER "beforeInsertAliment"
+    BEFORE INSERT
+    ON public.aliment
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.insert_ts_func();
+
+
+
+
+-- Trigger: beforeUpdateAliment
+
+-- DROP TRIGGER "beforeUpdateAliment" ON public.aliment;
+
+CREATE TRIGGER "beforeUpdateAliment"
+    BEFORE UPDATE 
+    ON public.aliment
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.update_ts_func();
+
+
+
+
+-- Trigger: beforeInsertFreezer
+
+-- DROP TRIGGER "beforeInsertFreezer" ON public.freezer;
+
+CREATE TRIGGER "beforeInsertFreezer"
+    BEFORE INSERT
+    ON public.freezer
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.insert_ts_func();
+
+
+    
+
+-- Trigger: beforeUpdateFreezer
+
+-- DROP TRIGGER "beforeUpdateFreezer" ON public.freezer;
+
+CREATE TRIGGER "beforeUpdateFreezer"
+    BEFORE UPDATE 
+    ON public.freezer
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.update_ts_func();

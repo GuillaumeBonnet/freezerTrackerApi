@@ -6,12 +6,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,38 +23,90 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @Controller
 public class MainController {
-	
 
+		
 	@Autowired
 	private FreezerRepository freezers;
 	@Autowired
 	private AlimentRepository aliments;
 	
 	public static void main(String[] args) throws Exception {
-        SpringApplication.run(MainController.class, args);      
-    }
-	
-	@RequestMapping("/aliments**")
-	@ResponseBody
-	public List<Aliment> getAliments(HttpServletRequest request) {
-    	return (List<Aliment>)aliments.findAll(); //"error no aliment for this id";
+		SpringApplication.run(MainController.class, args);      
 	}
 	
-	@RequestMapping(path="/aliment", method=RequestMethod.POST, headers="Content-type=application/json")
-	@ResponseBody
-	public Aliment saveAliment(HttpServletRequest request, @RequestBody Aliment aliment) {
-		System.out.println("todo debug");
-		System.out.println("todo debug" + request);
-		return aliments.save(aliment);
-	}
+	//freezers =====================================
 	
-	@RequestMapping(path="aliment/{idAliment}", method=RequestMethod.PUT, headers="Content-type=application/json")
+	@RequestMapping(path="/freezers", method=RequestMethod.POST, headers="Content-type=application/json")
 	@ResponseBody
-	public Aliment editAliment(HttpServletRequest request, @PathVariable("idAliment") String idAliment, @RequestBody Aliment aliment) {
-		Long id = null;
-		id = Long.valueOf(idAliment);
+	public boolean saveFreezer(HttpServletRequest request, @RequestBody Freezer freezer) {
+		try {
+			freezers.save(freezer);
+			return true;
+		} catch(Exception exception) {
+			return false;
+		}
+	}
+		
+	@RequestMapping(path="/freezers*", method=RequestMethod.GET, headers="Content-type=application/json")
+	@ResponseBody
+	public Set<Freezer> getFreezers(HttpServletRequest request) {
+		Set<Freezer> fromQuery = freezers.findAllWithAliments();
+
+		if ( request.getParameter("details") == null || ! request.getParameter("details").equals("complete")) {
+			for(Freezer item : fromQuery) {
+				item.setContent(null);
+			}
+		}
+
+    	return fromQuery;
+	}
+
+	@RequestMapping(path="/freezers/{idFreezer]}", method=RequestMethod.PUT, headers="Content-type=application/json")
+	@ResponseBody
+	public Freezer updateFreezer(HttpServletRequest request, @RequestBody Freezer freezer, @PathVariable("idFreezer") String idFreezer) {
+		Long id = Long.valueOf(idFreezer);
 		if (id == null) {
-			return null;
+			throw new Error("Invalid idFreezer in the url.");
+		}
+		Freezer sourceFreezer = null;
+		try {
+			sourceFreezer = freezers.findById(id).get();			
+		} catch(Exception e) {
+			System.out.println("error" + e.getMessage());
+		}
+
+		sourceFreezer.setName(freezer.getName());
+		return freezers.save(sourceFreezer);
+	}
+	
+	//aliments =====================================
+	
+	@RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.GET, headers="Content-type=application/json")
+	@ResponseBody
+	public Set<Aliment> getFreezerContent(HttpServletRequest request, @PathVariable("idFreezer") String idFreezer) {		
+		return aliments.findFreezerContent(Long.valueOf(idFreezer));
+	}
+	
+	@RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.POST, headers="Content-type=application/json")
+	@ResponseBody
+	public Aliment saveAliment(HttpServletRequest request, @PathVariable("idFreezer") String idFreezer, @RequestBody Aliment aliment) {
+
+		Freezer freezer = freezers.findById(Long.valueOf(idFreezer)).get();
+		//TODO:  catch NoSuchElementException for custom error output
+		aliment.setFreezer(
+			freezer
+		);
+		aliments.save(aliment);
+		aliment.setFreezer(null);
+		return aliment;
+	}
+	
+	@RequestMapping(path="/freezers/{idFreezer}/aliments/{idAliment}", method=RequestMethod.PUT, headers="Content-type=application/json")
+	@ResponseBody
+	public Aliment editAliment(HttpServletRequest request, @PathVariable("idAliment") String idFreezer, @PathVariable("idAliment") String idAliment, @RequestBody Aliment aliment) {
+		Long id = Long.valueOf(idAliment);
+		if (id == null) {
+			throw new Error("Invalid idAliment in the url.");
 		}
 		Aliment sourceAliment = null;
 		try {
@@ -70,82 +124,15 @@ public class MainController {
 		return aliments.save(sourceAliment);
 	}
 	
-	@RequestMapping(path="aliment/{idAliment}", method=RequestMethod.DELETE)
+	@RequestMapping(path="/freezers/{idFreezer}/aliments/{idAliment}", method=RequestMethod.DELETE)
 	@ResponseBody
 	public void deleteAliment(HttpServletRequest request, @PathVariable("idAliment") String idAliment) {
-		Long id = null;
-		id = Long.valueOf(idAliment);
-		System.out.println("delete id:" + id);
+		Long id = Long.valueOf(idAliment);
 		if (id == null) {
+			throw new Error("Invalid idAliment in the url.");
 		}
 		else {
 			aliments.deleteById(id);
 		}
 	}
-	
-	@RequestMapping(path="/freezers", method=RequestMethod.POST, headers="Content-type=application/json")
-	@ResponseBody
-	public boolean saveFreezer(HttpServletRequest request, @RequestBody Freezer freezer) {
-		try {
-			freezers.save(freezer);
-			return true;
-		} catch(Exception exception) {
-			return false;
-		}
-	}
-	
-	@RequestMapping("/freezer/{idFreezer}/aliments")
-	@ResponseBody
-	public Boolean saveAliment(@PathVariable("idFreezer") String idFreezer, @RequestBody Aliment alimentToSave, HttpServletRequest request) {
-	    	Optional<Freezer> freezer = null;
-	    	freezer = freezers.findById(Long.valueOf(idFreezer));
-	    	if(freezer == null) {
-	    		return false;
-	    	}
-	    	if(! aliments.existsById(alimentToSave.getId())) {
-	    		try {
-	    			alimentToSave = aliments.save(alimentToSave);
-	    			return true;
-	    		} catch(Exception exception) {
-	    			return false;
-	    		}
-    		}
-	    	freezer.get().content.add(alimentToSave);
-	    	
-	    	return true;
-	}
-	
-	@RequestMapping("/freezer/{idFreezer}/aliment/{idAliment}**")
-	@ResponseBody
-	public Aliment getAliment(@PathVariable("idFreezer") String idFreezer, @PathVariable("idAliment") String idAliment, HttpServletRequest request) {
-		if( freezers.existsById(Long.valueOf(idFreezer)) ) {
-	    	Optional<Freezer> freezer = freezers.findById(Long.valueOf(idFreezer));
-	    	for(Aliment aliment:freezer.get().content) {
-	    		if(aliment.getId() == Long.valueOf(idAliment)) {
-	    			return aliment;
-	    		}
-	    	}
-	    	return null; //"error no aliment for this id";
-	    }
-	    else {
-	    	return null; // "error no freezer n" + idFreezer;
-	    }
-	}
-	
-	@RequestMapping("/freezer/{idFreezer}**")
-	@ResponseBody
-	public Optional<Freezer> getFreezerContent(@PathVariable("idFreezer") String idFreezer, HttpServletRequest request) {
-		if( freezers.existsById(Long.valueOf(idFreezer)) ) {
-	    	return freezers.findById(Long.valueOf(idFreezer)); //"error no aliment for this id";
-	    }
-	    else {
-	    	return null; // "error no freezer n" + idFreezer;
-	    }
-	}
-	
-	@RequestMapping(path="/freezers**", method=RequestMethod.GET, headers="Content-type=application/json")
-	@ResponseBody
-	public List<Freezer> getFreezers(HttpServletRequest request) {
-    	return (List<Freezer>)freezers.findAll(); //"error no aliment for this id";
-	}    
 }

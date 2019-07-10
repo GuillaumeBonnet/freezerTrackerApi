@@ -1,7 +1,17 @@
 package api;
 
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface FreezerRepository extends CrudRepository<Freezer, Long> {
-	Freezer findByName(String firstName);
+
+	@Query("select distinct f from Freezer f left join fetch f.content c WHERE f.creationTimestamp != null ORDER BY f.updateTimestamp DESC")
+	Set<Freezer> findAllWithAliments();
+
+	@Query("select distinct f from Freezer f join fetch f.content c where f.id = :Id")
+	Freezer findByIdWithContent(@Param("Id")Long Id);
 }

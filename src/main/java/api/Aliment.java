@@ -1,30 +1,55 @@
 package api;
 
-
 import java.sql.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 public class Aliment extends EntityRoot {
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="freezer_id", referencedColumnName="id")
+	@JsonIgnore
+	private Freezer freezer;
 
+	@Column(name="name")
 	private String name;
+
+	@Column(name="category")
 	private String category;
+
+	@Column(name="iconic_font_name")
 	private String iconicFontName;
+
+	@Column(name="quantity")
 	private Double quantity;
+
+	@Column(name="quantity_unit")
 	private String quantityUnit;
+
+	@Column(name="stored_date")
 	private Date storedDate;
+
+	@Column(name="expiration_date")
 	private Date expirationDate;
-
+	
 	public Aliment() {}
-
+	
 	public Aliment(Long id) {
 		super();
 		this.id = id;
 	}
 	
-	public Aliment(String name, String category, String iconicFontName, Double quantity, String quantityUnit,
-			Date storedDate, Date expirationDate) {
+	public Aliment(Freezer freezer, String name, String category, String iconicFontName, Double quantity,
+			String quantityUnit, Date storedDate, Date expirationDate) {
 		super();
+		this.freezer = freezer;
 		this.name = name;
 		this.category = category;
 		this.iconicFontName = iconicFontName;
@@ -32,40 +57,27 @@ public class Aliment extends EntityRoot {
 		this.quantityUnit = quantityUnit;
 		this.storedDate = storedDate;
 		this.expirationDate = expirationDate;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Aliment [id=");
-		builder.append(id);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", category=");
-		builder.append(category);
-		builder.append(", iconicFontName=");
-		builder.append(iconicFontName);
-		builder.append(", quantity=");
-		builder.append(quantity);
-		builder.append(", quantityUnit=");
-		builder.append(quantityUnit);
-		builder.append(", storedDate=");
-		builder.append(storedDate);
-		builder.append(", expirationDate=");
-		builder.append(expirationDate);
-		builder.append("]");
-		builder.append('\n');
-		return builder.toString();
-	}
+	}	
 
 	/** Getters for name
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the freezer
+	 */
+	public Freezer getFreezer() {
+		return freezer;
+	}
+
+	/**
+	 * @param freezer the freezer to set
+	 */
+	public void setFreezer(Freezer freezer) {
+		this.freezer = freezer;
 	}
 
 	/** Getters for category
@@ -158,6 +170,23 @@ public class Aliment extends EntityRoot {
 	public void setExpirationDate(Date expirationDate) {
 		this.expirationDate = expirationDate;
 	}
+
+	@Override
+	public String toString() {
+		return 
+		"Aliment [ "
+		+ super.toString()
+		+ ", category=" + category 
+		+ ", expirationDate=" + expirationDate 
+		+ ", freezer=" + ( this.freezer == null ? "null" : this.freezer.hashCode() )				
+		+ ", iconicFontName=" + iconicFontName 
+		+ ", name=" + name 
+		+ ", quantity=" + quantity 
+		+ ", quantityUnit=" + quantityUnit 
+		+ ", storedDate=" + storedDate 
+		+ "]";
+	}
+
 
 
 

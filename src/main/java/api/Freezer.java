@@ -1,54 +1,64 @@
 package api;
 
-import java.util.List;
-import javax.persistence.ManyToMany;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import org.springframework.context.annotation.Lazy;
 
 @Entity
 public class Freezer extends EntityRoot {
-	protected String name;
-	@ManyToMany
-	protected List<Aliment> content;
-	
-	private Freezer() { }
 
-	public Freezer(String name, List<Aliment> content) {
+	@Column(name="name")
+	private String name;
+
+	@OneToMany(mappedBy = "freezer", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private Set<Aliment> content;
+	
+	public Freezer() { }
+
+	public Freezer(String name, Set<Aliment> content) {
 		super();
 		this.name = name;
 		this.content = content;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public List<Aliment> getContent() {
+	public Set<Aliment> getContent() {
 		return content;
 	}
 
-	public void setContent(List<Aliment> content) {
+	public void setContent(Set<Aliment> content) {
 		this.content = content;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Freezer [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", content=");
-		builder.append(content);
-		builder.append("]");
-		return builder.toString();
+		return 
+		"Freezer [ "+ super.toString() 
+		+ ", content=" + content 
+		+ ", name=" + name
+		+ "]";
 	}
+
+
 	
 	
 }
