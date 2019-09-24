@@ -86,7 +86,11 @@ public class MainController {
 			throw new Error("Invalid idFreezer in the url.");
 		}
 		Freezer sourceFreezer = null;
+		System.out.println("gboDebug [id] :" +  id);		
 		sourceFreezer = freezers.findByIdWithContent(id);
+		if(sourceFreezer == null) {
+			throw new Error("Freezer could not be retrieved from the database.");
+		}
 
 		Set<Aliment> content = sourceFreezer.getContent();
 		if( content != null ) {
