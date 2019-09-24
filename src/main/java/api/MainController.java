@@ -38,13 +38,9 @@ public class MainController {
 	
 	@RequestMapping(path="/freezers", method=RequestMethod.POST, headers="Content-type=application/json")
 	@ResponseBody
-	public boolean saveFreezer(HttpServletRequest request, @RequestBody Freezer freezer) {
-		try {
-			freezers.save(freezer);
-			return true;
-		} catch(Exception exception) {
-			return false;
-		}
+	public Freezer saveFreezer(HttpServletRequest request, @RequestBody Freezer freezer) {
+		freezers.save(freezer);
+		return freezer;
 	}
 		
 	@RequestMapping(path="/freezers*", method=RequestMethod.GET, headers="Content-type=application/json")
@@ -58,10 +54,10 @@ public class MainController {
 			}
 		}
 
-    	return fromQuery;
+		return fromQuery;
 	}
 
-	@RequestMapping(path="/freezers/{idFreezer]}", method=RequestMethod.PUT, headers="Content-type=application/json")
+	@RequestMapping(path="/freezers/{idFreezer}", method=RequestMethod.PUT, headers="Content-type=application/json")
 	@ResponseBody
 	public Freezer updateFreezer(HttpServletRequest request, @RequestBody Freezer freezer, @PathVariable("idFreezer") String idFreezer) {
 		Long id = Long.valueOf(idFreezer);
@@ -70,6 +66,7 @@ public class MainController {
 		}
 		Freezer sourceFreezer = null;
 		try {
+			
 			sourceFreezer = freezers.findById(id).get();			
 		} catch(Exception e) {
 			System.out.println("error" + e.getMessage());
@@ -77,6 +74,30 @@ public class MainController {
 
 		sourceFreezer.setName(freezer.getName());
 		return freezers.save(sourceFreezer);
+	}
+
+	@RequestMapping(path="/freezers/{idFreezer}", method=RequestMethod.DELETE, headers="Content-type=application/json")
+	@ResponseBody
+	public void deleteFreezer(HttpServletRequest request, @PathVariable("idFreezer") String idFreezer) {
+		// ToDoBetter: trigger on before delete which delete children instances
+		// TODO : In Unit Test check that the children aliments are really deleted.
+		Long id = Long.valueOf(idFreezer);
+		if (id == null) {
+			throw new Error("Invalid idFreezer in the url.");
+		}
+		Freezer sourceFreezer = null;
+		try {
+			sourceFreezer = freezers.findByIdWithContent(id);
+		} catch(Exception e) {
+			System.out.println("error" + e.getMessage());
+		}
+
+		Set<Aliment> content = sourceFreezer.getContent();
+		if( content != null ) {
+			aliments.deleteAll(content);
+		}
+
+		freezers.delete(sourceFreezer);
 	}
 	
 	//aliments =====================================
