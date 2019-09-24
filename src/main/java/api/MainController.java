@@ -86,11 +86,7 @@ public class MainController {
 			throw new Error("Invalid idFreezer in the url.");
 		}
 		Freezer sourceFreezer = null;
-		try {
-			sourceFreezer = freezers.findByIdWithContent(id);
-		} catch(Exception e) {
-			System.out.println("error" + e.getMessage());
-		}
+		sourceFreezer = freezers.findByIdWithContent(id);
 
 		Set<Aliment> content = sourceFreezer.getContent();
 		if( content != null ) {
