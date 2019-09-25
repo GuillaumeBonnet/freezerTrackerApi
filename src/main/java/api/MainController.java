@@ -65,11 +65,10 @@ public class MainController {
 			throw new Error("Invalid idFreezer in the url.");
 		}
 		Freezer sourceFreezer = null;
-		try {
 			
-			sourceFreezer = freezers.findById(id).get();			
-		} catch(Exception e) {
-			System.out.println("error" + e.getMessage());
+		sourceFreezer = freezers.findById(id).get();
+		if(sourceFreezer == null) {
+			throw new Error("Freezer could not be retrieved from the database.");
 		}
 
 		sourceFreezer.setName(freezer.getName());
@@ -85,6 +84,10 @@ public class MainController {
 		if (id == null) {
 			throw new Error("Invalid idFreezer in the url.");
 		}
+		
+		System.out.println("gboDebug [freezer] :" +  freezers.findById(id));
+		System.out.println("gboDebug [freezer with content] :" +  freezers.findByIdWithContent(id));
+		
 		Freezer sourceFreezer = null;
 		System.out.println("gboDebug [id] :" +  id);		
 		sourceFreezer = freezers.findByIdWithContent(id);
