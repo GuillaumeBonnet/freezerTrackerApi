@@ -1,21 +1,17 @@
-package api;
+package api.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
+
+import api.model.Aliment;
+import api.model.Freezer;
+import api.repository.AlimentRepository;
+import api.repository.FreezerRepository;
 
 
 
@@ -29,12 +25,10 @@ public class MainController {
 	private FreezerRepository freezers;
 	@Autowired
 	private AlimentRepository aliments;
-	
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(MainController.class, args);      
-	}
-	
-	//freezers =====================================
+
+	/* -------------------------------------------------------------------------- */
+	/*                                  freezers                                  */
+	/* -------------------------------------------------------------------------- */
 	
 	@RequestMapping(path="/freezers", method=RequestMethod.POST, headers="Content-type=application/json")
 	@ResponseBody
@@ -43,7 +37,7 @@ public class MainController {
 		return freezer;
 	}
 		
-	@RequestMapping(path="/freezers*", method=RequestMethod.GET, headers="Content-type=application/json")
+	@RequestMapping(path="/freezers*", method=RequestMethod.GET) //TODO: undo
 	@ResponseBody
 	public Set<Freezer> getFreezers(HttpServletRequest request) {
 		Set<Freezer> fromQuery = freezers.findAllWithAliments();
@@ -98,9 +92,12 @@ public class MainController {
 		freezers.delete(sourceFreezer);
 	}
 	
-	//aliments =====================================
+	/* -------------------------------------------------------------------------- */
+	/*                                  aliments                                  */
+	/* -------------------------------------------------------------------------- */
 	
-	@RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.GET, headers="Content-type=application/json")
+	// @RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.GET, headers="Content-type=application/json")
+	@RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.GET)
 	@ResponseBody
 	public Set<Aliment> getFreezerContent(HttpServletRequest request, @PathVariable("idFreezer") String idFreezer) {		
 		return aliments.findFreezerContent(Long.valueOf(idFreezer));

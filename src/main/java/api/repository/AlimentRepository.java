@@ -1,13 +1,12 @@
-package api;
+package api.repository;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import api.Aliment;
+import api.model.Aliment;
 
 public interface AlimentRepository extends CrudRepository<Aliment, Long> {
 

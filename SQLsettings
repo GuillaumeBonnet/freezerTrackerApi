@@ -1,4 +1,77 @@
--- FUNCTION: public.insert_ts_func()
+-- # ---------------------------------------------------------------------------- #
+-- #                                  Insert User                                 #
+-- # ---------------------------------------------------------------------------- #
+
+INSERT INTO users(id, username, password, is_enabled, email) VALUES (1, 'user', '{noop}password', true, 'bonnet.guillaume.93@gmail.com');
+INSERT INTO user_roles (user_id, username, role) VALUES (1, 'user', 'ROLE_USER');
+
+
+-- # ---------------------------------------------------------------------------- #
+-- #                                  User Schema                                 #
+-- # ---------------------------------------------------------------------------- #
+
+-- DROP TABLE public.user_roles;
+-- DROP TABLE public.users;
+
+CREATE TABLE users(
+    id bigint NOT NULL,
+    creation_timestamp timestamp without time zone,
+    update_timestamp timestamp without time zone,
+    username varchar(20) NOT NULL,
+    password varchar(20) NOT NULL,
+    email varchar(255) NOT NULL,
+    is_enabled boolean NOT NULL DEFAULT FALSE,
+    CONSTRAINT user_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE public.user_roles
+    OWNER to localherokuuser;
+
+create table user_roles (
+  id SERIAL PRIMARY KEY,
+  user_id bigint NOT NULL,
+  username varchar(20) NOT NULL,
+  role varchar(20) NOT NULL,
+  UNIQUE (id,role),
+  CONSTRAINT user_fkey FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+
+ALTER TABLE public.user_roles
+    OWNER to localherokuuser;
+
+
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeInsertUser                       #
+-- # ---------------------------------------------------------------------------- #
+
+-- DROP TRIGGER "beforeInsertUser" ON public.user;
+
+CREATE TRIGGER "beforeInsertUser"
+    BEFORE INSERT
+    ON public.users
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.insert_ts_func();
+
+    
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeUpdateUser                       #
+-- # ---------------------------------------------------------------------------- #
+
+-- DROP TRIGGER "beforeUpdateUser" ON public.user;
+
+CREATE TRIGGER "beforeUpdateUser"
+    BEFORE UPDATE 
+    ON public.users
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.update_ts_func();
+
+
+-- # ---------------------------------------------------------------------------- #
+-- #                     -- FUNCTION: public.insert_ts_func()                     #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP FUNCTION public.insert_ts_func();
 
@@ -19,9 +92,12 @@ ALTER FUNCTION public.insert_ts_func()
     OWNER TO xakqxrognahxgw;
 
 
+    
 
 
--- FUNCTION: public.update_ts_func()
+-- # ---------------------------------------------------------------------------- #
+-- #                     -- FUNCTION: public.update_ts_func()                     #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP FUNCTION public.update_ts_func();
 
@@ -42,7 +118,9 @@ ALTER FUNCTION public.update_ts_func()
 
 
 
--- Trigger: beforeInsertAliment
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeInsertAliment                       #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP TRIGGER "beforeInsertAliment" ON public.aliment;
 
@@ -55,7 +133,9 @@ CREATE TRIGGER "beforeInsertAliment"
 
 
 
--- Trigger: beforeUpdateAliment
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeUpdateAliment                       #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP TRIGGER "beforeUpdateAliment" ON public.aliment;
 
@@ -68,7 +148,9 @@ CREATE TRIGGER "beforeUpdateAliment"
 
 
 
--- Trigger: beforeInsertFreezer
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeInsertFreezer                       #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP TRIGGER "beforeInsertFreezer" ON public.freezer;
 
@@ -81,7 +163,9 @@ CREATE TRIGGER "beforeInsertFreezer"
 
     
 
--- Trigger: beforeUpdateFreezer
+-- # ---------------------------------------------------------------------------- #
+-- #                        -- Trigger: beforeUpdateFreezer                       #
+-- # ---------------------------------------------------------------------------- #
 
 -- DROP TRIGGER "beforeUpdateFreezer" ON public.freezer;
 

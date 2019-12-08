@@ -1,11 +1,11 @@
-package api;
+package api.repository;
 
-import java.util.List;
 import java.util.Set;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
+import api.model.Freezer;
 
 public interface FreezerRepository extends CrudRepository<Freezer, Long> {
 
