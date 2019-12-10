@@ -16,6 +16,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(CustomException.class)
 	public @ResponseBody ResponseEntity<ApiErrorResponse> handleNotFoundException(CustomException ex) {
+		
 		return new ApiErrorResponse()
 			.withStatus(HttpStatus.BAD_REQUEST)
 			.withError_code("BAD_REQUEST")
@@ -54,7 +55,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 	
 		public ApiErrorResponse withDetails(List<String> details) {
-			this.details.addAll(details);
+			if(details != null) {
+				this.details.addAll(details);
+			}
 			return this;
 		}
 
