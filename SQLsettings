@@ -12,7 +12,7 @@ INSERT INTO user_roles (user_id, username, role) VALUES (1, 'user', 'ROLE_USER')
 
 -- DROP TABLE public.user_roles;
 -- DROP TABLE public.users;
-CREATE TABLE users2(
+CREATE TABLE users(
     id bigint NOT NULL,
     creation_timestamp timestamp without time zone,
     update_timestamp timestamp without time zone,
@@ -22,15 +22,15 @@ CREATE TABLE users2(
     is_enabled boolean NOT NULL DEFAULT FALSE,
     CONSTRAINT user_pkey PRIMARY KEY (id)
     CONSTRAINT unique_email UNIQUE (email)
+    CONSTRAINT unique_username UNIQUE (username)
 );
 
-ALTER TABLE public.user_roles
+ALTER TABLE public.users
     OWNER to localherokuuser;
 
 create table user_roles (
-  id SERIAL PRIMARY KEY,
+  id bigint NOT NULL,
   user_id bigint NOT NULL,
-  username varchar(20) NOT NULL,
   role varchar(20) NOT NULL,
   UNIQUE (id,role),
   CONSTRAINT user_fkey FOREIGN KEY (user_id)
@@ -41,33 +41,6 @@ create table user_roles (
 
 ALTER TABLE public.user_roles
     OWNER to localherokuuser;
-
-
--- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeInsertUser                       #
--- # ---------------------------------------------------------------------------- #
-
--- DROP TRIGGER "beforeInsertUser" ON public.user;
-
-CREATE TRIGGER "beforeInsertUser"
-    BEFORE INSERT
-    ON public.users
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.insert_ts_func();
-
-    
--- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeUpdateUser                       #
--- # ---------------------------------------------------------------------------- #
-
--- DROP TRIGGER "beforeUpdateUser" ON public.user;
-
-CREATE TRIGGER "beforeUpdateUser"
-    BEFORE UPDATE 
-    ON public.users
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.update_ts_func();
-
 
 -- # ---------------------------------------------------------------------------- #
 -- #                     -- FUNCTION: public.insert_ts_func()                     #
@@ -91,10 +64,6 @@ $BODY$;
 ALTER FUNCTION public.insert_ts_func()
     OWNER TO xakqxrognahxgw;
 
-
-    
-
-
 -- # ---------------------------------------------------------------------------- #
 -- #                     -- FUNCTION: public.update_ts_func()                     #
 -- # ---------------------------------------------------------------------------- #
@@ -116,61 +85,8 @@ $BODY$;
 ALTER FUNCTION public.update_ts_func()
     OWNER TO xakqxrognahxgw;
 
-
-
 -- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeInsertAliment                       #
+-- #                                   Triggers                                   #
 -- # ---------------------------------------------------------------------------- #
+-- SQL for triggers using the functions are now generated with the scripts/SQL-generateTriggers.js
 
--- DROP TRIGGER "beforeInsertAliment" ON public.aliment;
-
-CREATE TRIGGER "beforeInsertAliment"
-    BEFORE INSERT
-    ON public.aliment
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.insert_ts_func();
-
-
-
-
--- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeUpdateAliment                       #
--- # ---------------------------------------------------------------------------- #
-
--- DROP TRIGGER "beforeUpdateAliment" ON public.aliment;
-
-CREATE TRIGGER "beforeUpdateAliment"
-    BEFORE UPDATE 
-    ON public.aliment
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.update_ts_func();
-
-
-
-
--- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeInsertFreezer                       #
--- # ---------------------------------------------------------------------------- #
-
--- DROP TRIGGER "beforeInsertFreezer" ON public.freezer;
-
-CREATE TRIGGER "beforeInsertFreezer"
-    BEFORE INSERT
-    ON public.freezer
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.insert_ts_func();
-
-
-    
-
--- # ---------------------------------------------------------------------------- #
--- #                        -- Trigger: beforeUpdateFreezer                       #
--- # ---------------------------------------------------------------------------- #
-
--- DROP TRIGGER "beforeUpdateFreezer" ON public.freezer;
-
-CREATE TRIGGER "beforeUpdateFreezer"
-    BEFORE UPDATE 
-    ON public.freezer
-    FOR EACH ROW
-    EXECUTE PROCEDURE public.update_ts_func();

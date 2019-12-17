@@ -1,0 +1,7 @@
+Hi ${username}!
+
+You have successfully created your ${frontEndRootUrl} account. Before you can use your account, please activate it by clicking the link bellow.
+
+${verificationLink}
+
+After activation you can log in with your username "${username}" (or your e-mail address "${email}") and your password.

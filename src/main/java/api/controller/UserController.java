@@ -36,6 +36,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import api.event.OnRegistrationCompleteEvent;
 import api.exceptionHandling.CustomException;
 import api.model.User;
 import api.repository.UserRepository;
@@ -47,7 +48,8 @@ public class UserController {
 
 	private static final RetentionPolicy RUNTIME = null;
 
-	// TODO: dig into db xss sanization
+	// TODO: dig into db xss/SQL sanization
+
 	@Autowired
 	ApplicationEventPublisher eventPublisher;
 
@@ -70,16 +72,14 @@ public class UserController {
 			//TODO: validity of username & password 20char, email: 255char
 
 		
-		if (result.hasErrors()) {
-			System.out.println("gboDebug [hasErrors] :");
-			
+		if (result.hasErrors()) {	
 			List<ObjectError> errors = result.getAllErrors();
 			List<String> exceptionDetails = new ArrayList<String>();
 			for(ObjectError error : errors) {
 				if(error instanceof FieldError) {
 					exceptionDetails.add(
 						String.format(
-							"The field [%s] has an error: %s.", //TODO:customLabel
+							"The field [%s] has an error: %s.", //TODO:Label
 							((FieldError)error).getField(), ((FieldError)error).getDefaultMessage()
 						)
 					);
@@ -98,17 +98,28 @@ public class UserController {
 		if (registered == null) {
 			throw new CustomException("User not registered");
 		}
+
+		try {
+			eventPublisher.publishEvent(
+				new OnRegistrationCompleteEvent(
+					registered
+					, request.getLocale()
+				)
+			);
+		} catch (Exception me) {
+			throw new CustomException("User was registered but the activation email could not be sent."); //TODO:Label
+		}
 	}
 
 	/* -------------------------------------------------------------------------- */
 	/*                                Utils methods                               */
 	/* -------------------------------------------------------------------------- */
 
-	// TODO! sql db unique username & email
-
 	private User createUserAccount(UserDto accountDto, BindingResult result) {
-		User newUser = new User(accountDto.userName, accountDto.password, accountDto.email, false);
 
+		User newUser = new User(accountDto.userName, accountDto.password, accountDto.email, false, "ROLE_USER");
+
+		// TOIMPROVE: one querry findBy for both email and username
 		if( ! this.userRepo.findByEmail(accountDto.email).isEmpty() ) {
 			throw new CustomException("There is already a user registered with this email address: '" + accountDto.email + "'.");
 		}
@@ -187,7 +198,7 @@ public class UserController {
 	public class EmailValidator implements ConstraintValidator<ValidEmail, String> {     
 		private Pattern pattern;
 		private Matcher matcher;
-		private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-+]+(.[_A-Za-z0-9-]+)*@" 
+		private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-+]+(.[_A-Za-z0-9-+]+)*@" 
 			+ "[A-Za-z0-9-]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})$";
 			
 		@Override
