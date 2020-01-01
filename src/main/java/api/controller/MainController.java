@@ -5,19 +5,20 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import api.model.Aliment;
 import api.model.Freezer;
 import api.repository.AlimentRepository;
 import api.repository.FreezerRepository;
 
-
-
-//@CrossOrigin(origins = "http://localhost:4200/ https://freezer-practice-front.herokuapp.com/")
-@CrossOrigin(origins = "*")
 @Controller
+@RequestMapping("/api")
 public class MainController {
 
 		
@@ -37,7 +38,7 @@ public class MainController {
 		return freezer;
 	}
 		
-	@RequestMapping(path="/freezers*", method=RequestMethod.GET) //TODO: undo
+	@RequestMapping(path="/freezers", method=RequestMethod.GET) //TODO: undo
 	@ResponseBody
 	public Set<Freezer> getFreezers(HttpServletRequest request) {
 		Set<Freezer> fromQuery = freezers.findAllWithAliments();

@@ -34,7 +34,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 	@Autowired
 	private JavaMailSender mailSender;
 
-	@Value("${FRONT_END_ROOT_URL:http://localhost:4200}") // TODO!: add this var to heroku conf
+	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}") // TODO: add this var to heroku conf
 	private String frontEndRootUrl;
 
 	@Value("classpath:Verification.customEmailTemplate")
@@ -54,7 +54,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		VerificationToken tokenEntity = new VerificationToken(user);
 		tokenRepo.save(tokenEntity);
 
-		String verificationLink = frontEndRootUrl + "/regitrationConfirm.html?token=" + tokenEntity.token;
+		String verificationLink = frontEndRootUrl + "/confirm-registration/" + tokenEntity.token;
 
 		SimpleMailMessage email = new SimpleMailMessage();
 		email.setTo(user.getEmail());

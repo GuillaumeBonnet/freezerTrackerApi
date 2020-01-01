@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 @SpringBootApplication
-@ComponentScan(basePackages = {"security", "api"})
+@ComponentScan(basePackages = {"configuration", "api"})
 public class ApplicationStartup {
 
 	/**

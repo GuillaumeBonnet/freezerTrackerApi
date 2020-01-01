@@ -1,6 +1,6 @@
 const clipboardy = require('clipboardy');
 
-let tableNames = ['user', 'aliment', 'freezer', 'verification_token'];
+let tableNames = ['users', 'aliment', 'freezer', 'verification_token'];
 function toTitleCase(inputString) {
     return inputString[0].toUpperCase() + inputString.substring(1);
 }
@@ -15,7 +15,7 @@ let resultingString = '';
             -- #          - Trigger: beforeUpdate${titleCasedName}
             -- # ---------------------------------------------------------------------------- #
 
-                -- DROP TRIGGER "beforeUpdate${titleCasedName}" ON public.${tableName};
+                DROP TRIGGER "beforeUpdate${titleCasedName}" ON public.${tableName};
 
                 CREATE TRIGGER "beforeUpdate${titleCasedName}"
                     BEFORE UPDATE 
@@ -27,7 +27,7 @@ let resultingString = '';
             -- #           - Trigger: beforeInsert${titleCasedName}
             -- # ---------------------------------------------------------------------------- #
 
-                -- DROP TRIGGER "beforeInsert${titleCasedName}" ON public.${tableName};
+                DROP TRIGGER "beforeInsert${titleCasedName}" ON public.${tableName};
 
                 CREATE TRIGGER "beforeInsert${titleCasedName}"
                     BEFORE INSERT

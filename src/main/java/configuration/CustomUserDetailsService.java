@@ -1,4 +1,4 @@
-package security;
+package configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 
         User user;
         try {
-            user = userRepository.findByUsername(username).get(0);
+            user = userRepository.findByUsername(username);
         } catch(IndexOutOfBoundsException ex) {
             throw new CustomException(
                 String.format("User of username: '%s' could not be found.", username)

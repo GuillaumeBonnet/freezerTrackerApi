@@ -8,4 +8,5 @@ import api.model.VerificationToken;
 public interface VerificationTokenRepository extends CrudRepository<VerificationToken, Long> {
 
     VerificationToken findByUser(User user);
+    VerificationToken findByToken(String token);
 }

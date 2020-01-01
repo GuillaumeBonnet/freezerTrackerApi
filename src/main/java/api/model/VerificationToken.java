@@ -44,5 +44,10 @@ public class VerificationToken extends EntityRoot {
         this.expirationDate = calculateExpirationDate(EXPIRATION_IN_MIN);
         this.token = UUID.randomUUID().toString(); // 128-bit value
     }
+
+    public VerificationToken() {
+    }
+
+    
     
 }
