@@ -5,15 +5,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import javax.persistence.EntityExistsException;
-import javax.servlet.http.HttpSession;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -21,26 +17,21 @@ import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import org.hibernate.exception.ConstraintViolationException;
-import org.postgresql.util.PSQLException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.stereotype.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import api.event.OnRegistrationCompleteEvent;
@@ -49,6 +40,7 @@ import api.model.User;
 import api.model.VerificationToken;
 import api.repository.UserRepository;
 import api.repository.VerificationTokenRepository;
+import api.service.UserService;
 
 //@CrossOrigin(origins = "http://localhost:4200/ https://freezer-practice-front.herokuapp.com/")
 @CrossOrigin(origins = "*")
@@ -74,7 +66,7 @@ public class UserController {
 		private VerificationTokenRepository tokenRepo;
 
 		@Autowired
-		private AuthenticationManager authenticationManager;
+		private UserService userService;
 
 	/* -------------------------------------------------------------------------- */
 	/*                                   Methods                                  */
@@ -83,7 +75,7 @@ public class UserController {
 		@RequestMapping(value = "/confirm-registration", method = RequestMethod.POST)
 		@ResponseBody
 		public void activateConfirmedAccount(@RequestBody String token) {
-			if( !SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser") ) {
+			if( this.userService.isLoggedIn() ) {
 				return;
 			}
 			VerificationToken tokenEntity = this.tokenRepo.findByToken(token);
@@ -112,7 +104,7 @@ public class UserController {
 
 			abortIfValidationErrors(result);
 
-			User registered = createUserAccount(accountDto, result);
+			User registered = this.userService.registerUser(accountDto);
 
 			if (registered == null) {
 				throw new CustomException("User not registered");
@@ -133,9 +125,12 @@ public class UserController {
 		@RequestMapping(value = "/info")
 		@ResponseBody
 		public UserInfoDto getUserInfo() {
-			User loggedUser = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			if( !loggedUser.isEnabled() || loggedUser.getUsername().equals("anonymousUser") ) {
+			if( this.userService.isNotLoggedIn() ) {
 				throw new CustomException("User is not logged-in.");
+			}
+			User loggedUser = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if( !loggedUser.isEnabled() ) {
+				throw new CustomException("User is not activated.");
 			}
 			return new UserInfoDto(loggedUser.getUsername(), loggedUser.getEmail());
 		}
@@ -150,16 +145,7 @@ public class UserController {
 			if(userToLogin == null) {
 				throw new CustomException("There is no User which has the username given.");
 			}
-			Authentication authenticationRequest =  new UsernamePasswordAuthenticationToken(userToLogin, loginDto.password, userToLogin.getAuthorities());
-			Authentication authenticationResponse;
-			try {
-				authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-			}
-			catch(AuthenticationException e) {
-				throw new CustomException(e.getMessage());
-			}
-
-			SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
+			this.userService.authenticateUser(userToLogin, loginDto.password);
 		}
 
 	/* -------------------------------------------------------------------------- */
@@ -187,24 +173,6 @@ public class UserController {
 				}
 				throw new CustomException("JSON Validation Error", exceptionDetails);
 			}
-		}
-		
-		private User createUserAccount(UserRegistrationDto accountDto, BindingResult result) {
-
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
-			User newUser = new User(accountDto.username, "{bcrypt}" + encoder.encode(accountDto.password), accountDto.email, false, "ROLE_USER");
-
-			// TOIMPROVE: one querry findBy for both email and username
-			if( this.userRepo.findByEmail(accountDto.email) != null ) {
-				throw new CustomException("There is already a user registered with this email address: '" + accountDto.email + "'.");
-			}
-
-			if( this.userRepo.findByUsername(accountDto.username) != null ) {
-				throw new CustomException("There is already a user registered with this username: '" + accountDto.username + "'.");
-			}
-
-			newUser = this.userRepo.save(newUser);
-			return newUser;
 		}
 	/* -------------------------------------------------------------------------- */
 	/*                                    inner DTOs                              */

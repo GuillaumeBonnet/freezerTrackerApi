@@ -66,9 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
         // ensure the passwords are encoded properly        
-        auth
-            .userDetailsService(customUserDetailsService);
-        ;
+        auth.userDetailsService(customUserDetailsService);
     }
 
     @Bean

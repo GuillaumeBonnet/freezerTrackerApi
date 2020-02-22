@@ -3,22 +3,49 @@ package api.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@NamedEntityGraph(
+	name="user.freezers"
+	, attributeNodes = {
+		@NamedAttributeNode("freezers")
+	}
+)
+@NamedEntityGraph(
+	name="user.freezers.content"
+	, attributeNodes = {
+		@NamedAttributeNode(value = "freezers", subgraph = "content-subgraph"),
+	}
+	, subgraphs = {
+		@NamedSubgraph(
+			name = "content-subgraph",
+			attributeNodes = {
+				@NamedAttributeNode("content"),
+			}
+		)
+	}
+)
 @Entity(name = "users") // "user" is a restriced keywords in postgreql
 public class User extends EntityRoot implements UserDetails {
 
-	@Column(name="username")
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Column(name = "username")
 	private String username;
 
 	@Column(name="password")
@@ -32,6 +59,13 @@ public class User extends EntityRoot implements UserDetails {
 
 	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<UserRole> roles;
+
+	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private Set<Freezer> freezers;
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   Methods                                  */
+	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------------------------------------------------- */
 	/*                                Constructors                                */
@@ -47,6 +81,7 @@ public class User extends EntityRoot implements UserDetails {
 				role.setUser(this);
 			}
 			this.roles = roles;
+			this.freezers = new HashSet<Freezer>();
 		}
 
 		public User(String username, String password, String email, Boolean isEnabled, String role) {
@@ -57,6 +92,7 @@ public class User extends EntityRoot implements UserDetails {
 			Set<UserRole> roles = new HashSet<UserRole>();
 			roles.add(new UserRole(this, role));
 			this.roles = roles;
+			this.freezers = new HashSet<Freezer>();
 		}
 		
 		public User(String username, String password, String email, Boolean isEnabled, Collection<String> roles) {
@@ -68,9 +104,11 @@ public class User extends EntityRoot implements UserDetails {
 				.map((role) -> new UserRole(this, role))
 				.collect(Collectors.toSet())
 			;
+			this.freezers = new HashSet<Freezer>();
 		}
 
 		public User() {
+			this.freezers = new HashSet<Freezer>();
 		}
 
 	/* -------------------------------------------------------------------------- */
@@ -139,5 +177,21 @@ public class User extends EntityRoot implements UserDetails {
 
 	public void setIsEnabled(Boolean isEnabled) {
 		this.isEnabled = isEnabled;
+	}
+
+	public Set<UserRole> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<UserRole> roles) {
+		this.roles = roles;
+	}
+
+	public Set<Freezer> getFreezers() {
+		return freezers;
+	}
+
+	public void setFreezers(Set<Freezer> freezers) {
+		this.freezers = freezers;
 	}
 }

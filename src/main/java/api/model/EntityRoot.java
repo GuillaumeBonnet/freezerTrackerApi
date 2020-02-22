@@ -6,11 +6,12 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.InheritanceType;
 
+import com.fasterxml.jackson.annotation.JsonView;
 
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
@@ -18,15 +19,21 @@ import org.hibernate.annotations.GenerationTime;
 @MappedSuperclass  
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) 
 public abstract class EntityRoot {
-	@Id @GeneratedValue @Column(name="id")
+	
+	@JsonView(JsonViews.Summary.class)
+	@Id
+	@GeneratedValue
+	@Column(name="id")
 	protected Long id;
 	
-    @Generated(value = GenerationTime.INSERT)
+	@JsonView(JsonViews.Summary.class)
+	@Generated(value = GenerationTime.INSERT)
     @Temporal(value=TemporalType.TIMESTAMP)
     @Column(name="creation_timestamp")
     protected Date creationTimestamp;
 
-    @Generated(value = GenerationTime.ALWAYS)
+	@JsonView(JsonViews.Summary.class)
+	@Generated(value = GenerationTime.ALWAYS)
 	@Temporal(value=TemporalType.TIMESTAMP)
 	@Column(name="update_timestamp")
     protected Date updateTimestamp;

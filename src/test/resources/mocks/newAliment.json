@@ -1,0 +1,9 @@
+{
+    "name":"newName",
+    "category":"newCategory",
+    "iconicFontName":"newIconicFontName",
+    "quantity":1,
+    "quantityUnit":"newQuantityUnit",
+    "storedDate":"1234-05-06T04:05:40.887",
+    "expirationDate":"2234-05-06T04:05:40.887"
+}

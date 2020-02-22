@@ -1,0 +1,9 @@
+{
+    "name":"changedName",
+    "category":"fromage",
+    "iconicFontName":"icon-batch1_steak",
+    "quantity":1.0,
+    "quantityUnit":"fromages",
+    "storedDate":"2030-01-01T04:05:40.887",
+    "expirationDate":"2040-01-01T04:05:40.887"
+}

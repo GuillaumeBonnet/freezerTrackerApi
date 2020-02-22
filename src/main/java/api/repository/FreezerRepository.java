@@ -1,6 +1,8 @@
 package api.repository;
 
+import java.util.Optional;
 import java.util.Set;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,5 +15,7 @@ public interface FreezerRepository extends CrudRepository<Freezer, Long> {
 	Set<Freezer> findAllWithAliments();
 
 	@Query("select distinct f from Freezer f left join fetch f.content c WHERE f.id = :Id")
-	Freezer findByIdWithContent(@Param("Id")Long Id);
+	Optional<Freezer> findByIdWithAliments(@Param("Id")Long Id);
+
+	Freezer findByName(String name);
 }

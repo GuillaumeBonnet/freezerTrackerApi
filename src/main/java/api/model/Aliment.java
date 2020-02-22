@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 
 @Entity
@@ -19,24 +20,31 @@ public class Aliment extends EntityRoot {
 	@JsonIgnore
 	private Freezer freezer;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="name")
 	private String name;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="category")
 	private String category;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="iconic_font_name")
 	private String iconicFontName;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="quantity")
 	private Double quantity;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="quantity_unit")
 	private String quantityUnit;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="stored_date")
 	private Date storedDate;
 
+	@JsonView(JsonViews.Details.class)
 	@Column(name="expiration_date")
 	private Date expirationDate;
 	

@@ -1,7 +1,6 @@
 package api.event;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import api.exceptionHandling.CustomException;
 import api.model.User;
 import api.model.VerificationToken;
-import api.repository.UserRepository;
 import api.repository.VerificationTokenRepository;
 
 @Component
@@ -68,7 +66,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		try {
 			verifTmplt = new String(this.verifTmpltRes.getInputStream().readAllBytes(), StandardCharsets.UTF_8);			
 		} catch ( IOException e) {
-			throw new CustomException("User was registered but the activation email could not be sent."); //TODO:Label
+			throw new CustomException("User was registered but the activation email could not be sent(email template)."); //TODO:Label
 			//TODO error number uniquely referenced in the code.
 		}
 
