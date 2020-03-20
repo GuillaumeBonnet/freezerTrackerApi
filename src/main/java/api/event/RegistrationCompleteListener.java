@@ -1,7 +1,9 @@
 package api.event;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.assertj.core.util.Files;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -64,7 +66,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 	private String emailBody(User user, String frontEndRootUrl, String verificationLink) {
 		String verifTmplt;
 		try {
-			verifTmplt = new String(this.verifTmpltRes.getInputStream().readAllBytes(), StandardCharsets.UTF_8);			
+			verifTmplt = Files.contentOf(this.verifTmpltRes.getFile(), Charset.defaultCharset());	
 		} catch ( IOException e) {
 			throw new CustomException("User was registered but the activation email could not be sent(email template)."); //TODO:Label
 			//TODO error number uniquely referenced in the code.
