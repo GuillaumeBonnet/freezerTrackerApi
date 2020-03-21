@@ -1,5 +1,8 @@
 package api.event;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -34,7 +37,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 	@Autowired
 	private JavaMailSender mailSender;
 
-	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}") // TODO: add this var to heroku conf
+	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}")
 	private String frontEndRootUrl;
 
 	@Value("classpath:Verification.customEmailTemplate")
@@ -46,7 +49,6 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
-		System.out.println("gboDebug [at start of event handling]");
 		this.confirmRegistration(event);
 	}
 
@@ -61,18 +63,13 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		email.setTo(user.getEmail());
 		email.setSubject("Registration Confirmation");
 		email.setText( emailBody(user, frontEndRootUrl, verificationLink) );
-		System.out.println("gboDebug [before sending email] :");
 		mailSender.send(email);
 	}
 
 	private String emailBody(User user, String frontEndRootUrl, String verificationLink) {
 		String verifTmplt;
 		try {
-			System.out.println("gboDebug [verifTmpltRes] :" +  verifTmpltRes);
-			System.out.println("gboDebug [verifTmpltRes.isFile()] :" +  verifTmpltRes.isFile());
-			System.out.println("gboDebug [verifTmpltRes.isReadable()] :" +  verifTmpltRes.isReadable());
-					
-			verifTmplt = Files.contentOf(this.verifTmpltRes.getFile(), Charset.defaultCharset());	
+			verifTmplt = readString(verifTmpltRes.getInputStream());
 		} catch ( IOException e) {
 			System.out.println("[exeption email template] :" +  e);			
 			throw new CustomException("User was registered but the activation email could not be sent(email template)."); //TODO:Label
@@ -86,5 +83,18 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		verifTmplt = verifTmplt.replace("${email}", user.getEmail());
 
 		return verifTmplt;
+	}
+
+	private String readString(InputStream is) throws IOException {
+		char[] buf = new char[2048];
+		Reader r = new InputStreamReader(is, "UTF-8");
+		StringBuilder s = new StringBuilder();
+		while (true) {
+			int n = r.read(buf);
+			if (n < 0)
+				break;
+			s.append(buf, 0, n);
+		}
+		return s.toString();
 	}
 }
