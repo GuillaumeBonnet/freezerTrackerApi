@@ -209,9 +209,18 @@ public class MainController {
 	/*                                Utils Methods                               */
 	/* -------------------------------------------------------------------------- */
 	public void checksIfFreezerOwned(Optional<Freezer> freezer) {
+		System.out.println("gboDebug [freezer] :" +  freezer);
+		System.out.println("gboDebug [freezer.isPresent()] :" +  freezer.isPresent());
+		System.out.println("gboDebug [freezer.get().getUser()] :" +  freezer.get().getUser());
+		System.out.println("gboDebug [freezer.get().getUser().getId()] :" +  freezer.get().getUser().getId());
+		System.out.println("gboDebug [this.userService.getCurrentUser().getId()] :" +  this.userService.getCurrentUser().getId());
+		
+		
+		
+		
 		if(!freezer.isPresent() || freezer.get().getUser() == null 
 			|| freezer.get().getUser().getId() != this.userService.getCurrentUser().getId()) {
-			throw new Error("You can only modify content of Freezers you own.");
+			throw new CustomException("You can only interact with content of Freezers you own.");
 		}		
 	}
 
