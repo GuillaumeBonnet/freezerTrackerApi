@@ -117,8 +117,9 @@ public class UserController {
 						, request.getLocale()
 					)
 				);
+			} catch (CustomException me) { //don't catch CustomExceptions
 			} catch (Exception me) {
-				System.out.println("gboDebug [exception email not sent] :" +  me);				
+				System.out.println("[exception email not sent] :" +  me);				
 				throw new CustomException("User was registered but the activation email could not be sent."); //TODO:Label
 			}
 		}

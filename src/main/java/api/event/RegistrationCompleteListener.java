@@ -70,6 +70,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		try {
 			verifTmplt = Files.contentOf(this.verifTmpltRes.getFile(), Charset.defaultCharset());	
 		} catch ( IOException e) {
+			System.out.println("[exeption email template] :" +  e);			
 			throw new CustomException("User was registered but the activation email could not be sent(email template)."); //TODO:Label
 			//TODO error number uniquely referenced in the code.
 		}
