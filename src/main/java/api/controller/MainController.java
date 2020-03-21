@@ -209,7 +209,6 @@ public class MainController {
 	/*                                Utils Methods                               */
 	/* -------------------------------------------------------------------------- */
 	public void checksIfFreezerOwned(Optional<Freezer> freezer) {
-		System.out.println("gboDebug [freezer] :" +  freezer);
 		System.out.println("gboDebug [freezer.isPresent()] :" +  freezer.isPresent());
 		System.out.println("gboDebug [freezer.get().getUser()] :" +  freezer.get().getUser());
 		System.out.println("gboDebug [freezer.get().getUser().getId()] :" +  freezer.get().getUser().getId());
