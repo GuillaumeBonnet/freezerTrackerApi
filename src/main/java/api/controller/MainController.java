@@ -212,6 +212,7 @@ public class MainController {
 		System.out.println("gboDebug [freezer.isPresent()] :" +  freezer.isPresent());
 		System.out.println("gboDebug [this.userService.getCurrentUser().getId()] :" +  this.userService.getCurrentUser().getId());
 		System.out.println("gboDebug [freezer.get().getUser().getId()] :" +  freezer.get().getUser().getId());
+		System.out.println("gboDebug [freezer.get().getUser()] :" +  freezer.get().getUser());
 		
 		
 		
