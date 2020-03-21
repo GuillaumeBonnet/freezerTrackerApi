@@ -111,7 +111,6 @@ public class UserController {
 			}
 
 			try {
-				System.out.println("gboDebug [before publishing event]");				
 				eventPublisher.publishEvent(
 					new OnRegistrationCompleteEvent(
 						registered
@@ -119,6 +118,7 @@ public class UserController {
 					)
 				);
 			} catch (Exception me) {
+				System.out.println("gboDebug [exception email not sent] :" +  me);				
 				throw new CustomException("User was registered but the activation email could not be sent."); //TODO:Label
 			}
 		}
