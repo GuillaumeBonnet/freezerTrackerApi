@@ -118,6 +118,7 @@ public class UserController {
 					)
 				);
 			} catch (CustomException me) { //don't catch CustomExceptions
+				throw me;
 			} catch (Exception me) {
 				System.out.println("[exception email not sent] :" +  me);				
 				throw new CustomException("User was registered but the activation email could not be sent."); //TODO:Label

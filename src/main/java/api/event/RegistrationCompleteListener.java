@@ -68,6 +68,10 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 	private String emailBody(User user, String frontEndRootUrl, String verificationLink) {
 		String verifTmplt;
 		try {
+			System.out.println("gboDebug [verifTmpltRes] :" +  verifTmpltRes);
+			System.out.println("gboDebug [verifTmpltRes.isFile()] :" +  verifTmpltRes.isFile());
+			System.out.println("gboDebug [verifTmpltRes.isReadable()] :" +  verifTmpltRes.isReadable());
+					
 			verifTmplt = Files.contentOf(this.verifTmpltRes.getFile(), Charset.defaultCharset());	
 		} catch ( IOException e) {
 			System.out.println("[exeption email template] :" +  e);			
