@@ -46,6 +46,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+		System.out.println("gboDebug [at start of event handling]");
 		this.confirmRegistration(event);
 	}
 
@@ -60,6 +61,7 @@ public class RegistrationCompleteListener implements ApplicationListener<OnRegis
 		email.setTo(user.getEmail());
 		email.setSubject("Registration Confirmation");
 		email.setText( emailBody(user, frontEndRootUrl, verificationLink) );
+		System.out.println("gboDebug [before sending email] :");
 		mailSender.send(email);
 	}
 

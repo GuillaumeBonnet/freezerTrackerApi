@@ -111,6 +111,7 @@ public class UserController {
 			}
 
 			try {
+				System.out.println("gboDebug [before publishing event]");				
 				eventPublisher.publishEvent(
 					new OnRegistrationCompleteEvent(
 						registered
