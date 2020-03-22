@@ -89,7 +89,8 @@ public class MainController {
 		}
 
 		User currentUser = this.userService.getCurrentUser();
-		if(sourceFreezer.getUser() == null || sourceFreezer.getUser().getId() != currentUser.getId()) {
+		if(sourceFreezer.getUser() == null 
+			|| !sourceFreezer.getUser().getId().equals(currentUser.getId())) {
 			throw new Error("You cannot change a freezer you don't own.");
 		}
 
@@ -114,7 +115,8 @@ public class MainController {
 		}
 
 		User currentUser = this.userService.getCurrentUser();
-		if(sourceFreezer.getUser() == null || sourceFreezer.getUser().getId() != currentUser.getId()) {
+		if(sourceFreezer.getUser() == null
+			|| ! sourceFreezer.getUser().getId().equals(currentUser.getId()) ) {
 			throw new Error("You cannot delete a freezer you don't own.");
 		}
 
@@ -134,7 +136,7 @@ public class MainController {
 	@RequestMapping(path="/freezers/{idFreezer}/aliments", method=RequestMethod.GET)
 	@ResponseBody
 	public Set<Aliment> getFreezerContent(HttpServletRequest request, @PathVariable("idFreezer") String idFreezer) {
-		Optional<Freezer> freezer = freezers.findById(Long.valueOf(idFreezer));
+		Optional<Freezer> freezer = freezers.findByIdWithAliments(Long.valueOf(idFreezer));
 
 		checksIfFreezerOwned(freezer);
 		return freezer.get().getContent();
@@ -168,7 +170,7 @@ public class MainController {
 			throw new Error("Invalid idAliment in the url.");
 		}
 		Aliment sourceAliment = HashSet.ofAll(freezer.getContent())
-			.find((Aliment alim) -> alim.getId() == id)
+			.find((Aliment alim) -> alim.getId().equals(id))
 			.get()
 		;
 		if(sourceAliment == null) {
@@ -196,7 +198,7 @@ public class MainController {
 		}
 
 		Boolean isAlimentInFreezer = HashSet.ofAll(freezerOpt.get().getContent())
-			.exists((Aliment aliment) -> aliment.getId() == id);
+			.exists((Aliment aliment) -> aliment.getId().equals(id));
 
 		if(!isAlimentInFreezer) {
 			throw new CustomException(String.format("The aliment of Id %s could not be found in freezer %s", idAliment, idFreezer));
@@ -208,17 +210,9 @@ public class MainController {
 	/* -------------------------------------------------------------------------- */
 	/*                                Utils Methods                               */
 	/* -------------------------------------------------------------------------- */
-	public void checksIfFreezerOwned(Optional<Freezer> freezer) {
-		System.out.println("gboDebug [freezer.isPresent()] :" +  freezer.isPresent());
-		System.out.println("gboDebug [this.userService.getCurrentUser().getId()] :" +  this.userService.getCurrentUser().getId());
-		System.out.println("gboDebug [freezer.get().getUser().getId()] :" +  freezer.get().getUser().getId());
-		System.out.println("gboDebug [freezer.get().getUser()] :" +  freezer.get().getUser());
-		
-		
-		
-		
-		if(!freezer.isPresent() || freezer.get().getUser() == null 
-			|| freezer.get().getUser().getId() != this.userService.getCurrentUser().getId()) {
+	public void checksIfFreezerOwned(Optional<Freezer> freezer) {		
+		if(!freezer.isPresent() ||
+		! freezer.get().getUser().getId().equals(this.userService.getCurrentUser().getId())) { // TODO understand why there was no unboxing and Long != Long failed
 			throw new CustomException("You can only interact with content of Freezers you own.");
 		}		
 	}

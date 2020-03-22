@@ -79,6 +79,10 @@ public class MainController_TEST {
         this.userService.authenticateUser(this.userRepo.findByUsername("username"), "password");
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                  Freezers                                  */
+    /* -------------------------------------------------------------------------- */
+
     @Test
 	public void saveFreezer() throws Exception {
         String saveFreezerJson = Files.contentOf(new File(getClass().getResource("/mocks/saveFreezer.json").getFile()), "UTF-8");
@@ -170,6 +174,28 @@ public class MainController_TEST {
         ;
         assertEquals(-1, this.freezerRepo.count()-countBeforeWS, "Freezer count should be -1.");
         assertFalse(this.freezerRepo.findById(mainFreezerId).isPresent(), "The freezer should not be in DB anymore.");
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                  Aliments                                  */
+    /* -------------------------------------------------------------------------- */
+
+    @Test
+    public void getAliments() throws Exception {
+        Long mainFreezerId = this.freezerRepo.findByName("Main Freezer").getId();
+        String responseJson = this.mockMvc.perform(
+                get("/api/freezers/" + mainFreezerId + "/aliments")
+                .header("Content-type", "application/json")
+            )
+            .andDo(print())
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse().getContentAsString()
+        ;
+        ObjectMapper objectMapper = new ObjectMapper();
+        Set<Aliment> returnedAliments = objectMapper.readValue(responseJson, new TypeReference<Set<Aliment>>() {});
+        assertEquals(1, returnedAliments.size(), "There should be 1 aliments linked to the main Freezer.");
+        assertEquals("camembert", returnedAliments.iterator().next().getName(), "The aliment in the main freezer should be 'camembert'");
     }
 
     @Test
