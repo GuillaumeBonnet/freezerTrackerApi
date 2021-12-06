@@ -32,6 +32,7 @@ public class UserService {
 
 	public Boolean isLoggedIn() {
         Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("gboDebug [currentAuth] :" + currentAuth);
 		return currentAuth != null && !(currentAuth instanceof AnonymousAuthenticationToken);
 	}
 
@@ -48,6 +49,8 @@ public class UserService {
 		catch(AuthenticationException e) {
             throw new CustomException(e.getMessage());
         }
+        System.out.println("gboDebug [authenticationResponse] :" + authenticationResponse);
+
 		SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
     }
     
