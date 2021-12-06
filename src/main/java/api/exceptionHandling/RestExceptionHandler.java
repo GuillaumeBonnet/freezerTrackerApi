@@ -31,7 +31,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	/* -------------------------------------------------------------------------- */
 
 	@XmlRootElement(name = "error")
-	public class ApiErrorResponse {
+	public static class ApiErrorResponse {
 
 		private HttpStatus status;
 		private String error_code;
