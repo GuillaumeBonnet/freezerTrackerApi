@@ -41,6 +41,8 @@ public class UserService {
     }
     
     public void authenticateUser(@NotNull User userToLogin, @NotNull @NotEmpty String password) {
+        System.out.println("gboDebug [authenticateUser()] :");
+
 		Authentication authenticationRequest =  new UsernamePasswordAuthenticationToken(userToLogin, password, userToLogin.getAuthorities());
 		Authentication authenticationResponse;
 		try {
