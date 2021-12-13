@@ -2,6 +2,7 @@ package configuration;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity(debug = true)
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
@@ -28,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${FRONT_END_ROOT_URL:http://localhost:8080}") // TODO!: add this var to heroku conf
     private String frontEndRootUrl;
+	private String expectedHostUrl = "http://localhost:4200/";
     
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
@@ -53,7 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						})
 						.invalidateHttpSession(true) // by default true
 				);
-		String expectedHostUrl = "http://localhost:4200/";
 		http.antMatcher("/").headers().contentSecurityPolicy("frame-ancestors " + expectedHostUrl + ";");
 		http.antMatcher("/").headers().frameOptions().disable()
 				.addHeaderWriter(
@@ -76,17 +80,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
-    // @Bean
-    // CorsConfigurationSource corsConfigurationSource() {
+	// @Bean
+	// CorsConfigurationSource corsConfigurationSource() {
 	// CorsConfiguration configuration = new CorsConfiguration();
-	// configuration.setAllowedOrigins(Arrays.asList("*"));
+	// configuration.setAllowedOrigins(Arrays.asList("http://localhost:4201"));
 
 	// // configuration.setAllowedOrigins(Arrays.asList(frontEndRootUrl));
-	// configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+	// configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
 	// configuration.setAllowedHeaders(Arrays.asList("X-XSRF-TOKEN"));
 	// UrlBasedCorsConfigurationSource source = new
 	// UrlBasedCorsConfigurationSource();
 	// source.registerCorsConfiguration("/**", configuration);
 	// return source;
-    // }
+	// }
 }
