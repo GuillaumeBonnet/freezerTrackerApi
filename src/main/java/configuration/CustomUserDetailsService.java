@@ -9,23 +9,24 @@ import org.springframework.stereotype.Service;
 import api.exceptionHandling.CustomException;
 import api.model.User;
 import api.repository.UserRepository;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    
+
     @Autowired
     UserRepository userRepository;
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                
         User user;
         try {
             user = userRepository.findByUsername(username);
         } catch(IndexOutOfBoundsException ex) {
             throw new CustomException(
-                String.format("User of username: '%s' could not be found.", username)
-            );
+                    String.format("User of username: '%s' could not be found.", username));
+        }
+        if (user == null) {
+            throw new CustomException(
+                    String.format("User of username: '%s' could not be found.", username));
         }
         return user;
     }

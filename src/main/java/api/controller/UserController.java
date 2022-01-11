@@ -20,8 +20,10 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -42,8 +44,6 @@ import api.repository.UserRepository;
 import api.repository.VerificationTokenRepository;
 import api.service.UserService;
 
-//@CrossOrigin(origins = "http://localhost:4200/ https://freezer-practice-front.herokuapp.com/")
-@CrossOrigin(origins = "*")
 @Controller
 @RequestMapping("/api/users")
 public class UserController {
@@ -67,6 +67,9 @@ public class UserController {
 
 		@Autowired
 		private UserService userService;
+
+		@Autowired
+		public AuthenticationManager authenticationManager;
 
 	/* -------------------------------------------------------------------------- */
 	/*                                   Methods                                  */
@@ -142,12 +145,12 @@ public class UserController {
 		@ResponseBody
 		public void login(@RequestBody @Valid UserLoginDto loginDto, BindingResult result, WebRequest request) {
 			abortIfValidationErrors(result);
-
 			User userToLogin = this.userRepo.findByUsername(loginDto.username);
 
-			if(userToLogin == null) {
+			if (userToLogin == null) {
 				throw new CustomException("There is no User which has the username given.");
 			}
+
 			this.userService.authenticateUser(userToLogin, loginDto.password);
 		}
 

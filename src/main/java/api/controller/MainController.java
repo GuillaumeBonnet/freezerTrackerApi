@@ -48,7 +48,8 @@ public class MainController {
 	@RequestMapping(path="/freezers", method=RequestMethod.POST, headers="Content-type=application/json")
 	@ResponseBody
 	public /*Freezer*/MappingJacksonValue saveFreezer(HttpServletRequest request, @RequestBody Freezer freezer) {
-		User currentUser = this.userService.getCurrentUser();		freezer.setUser(currentUser);
+		User currentUser = this.userService.getCurrentUser();
+		freezer.setUser(currentUser);
 		freezers.save(freezer);
 
 		final MappingJacksonValue result = new MappingJacksonValue(freezer);

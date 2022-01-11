@@ -1,8 +1,7 @@
 package configuration;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,12 +20,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+@Configuration
 @EnableWebSecurity(debug = true)
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -36,34 +34,50 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-        http
-				.cors(corsCustomizer -> {
-				}) // by default uses a Bean by the name of corsConfigurationSource
+		http.cors().configurationSource(
+				request -> {
+					CorsConfiguration corsConf = new CorsConfiguration().applyPermitDefaultValues();
+					corsConf.setAllowedOrigins(List.of("http://localhost:4201"));
+					corsConf.setAllowCredentials(true);
+					corsConf.addAllowedHeader("*");
+					corsConf.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT"));
+					// exposedHeaders(HttpHeaders.SET_COOKIE).maxAge(3600L); //maxAge(3600)
+					// indicates that in 3600 seconds, there is no need to send a pre check
+					// request,
+					// and the result can be cached
+					return corsConf;
+				});
+		http// by default uses a Bean by the name of corsConfigurationSource
+				.csrf().disable()
+				// .csrf(csrf -> csrf
+				// .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 				.authorizeRequests(authorizeRequests -> authorizeRequests
-						.antMatchers("/api/users/info").authenticated()
-						.antMatchers("/api/users/**").permitAll()
+						.antMatchers("/api/users/confirm-registration").permitAll()
+						.antMatchers("/api/users/registration").permitAll()
+						.antMatchers("/api/users/login").permitAll()
 						.antMatchers("/api/**").authenticated()
-						.antMatchers("/**").permitAll()
-						.anyRequest().authenticated())
-				.csrf(csrf -> csrf
-						.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+						.antMatchers("/**").permitAll())
+				.headers(headers -> {
+					headers.contentSecurityPolicy("frame-ancestors " +
+							expectedHostUrl + ";");
+					headers.frameOptions().disable();
+					headers.addHeaderWriter(
+							new StaticHeadersWriter("X-FRAME-OPTIONS", "ALLOW-FROM " +
+									expectedHostUrl));
+				})
 				.logout(logout -> logout
 						.logoutUrl("/api/users/logout")
 						.logoutSuccessHandler(new LogoutSuccessHandler() {
 							@Override
-							public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
+							public void onLogoutSuccess(HttpServletRequest request,
+									HttpServletResponse response,
 									Authentication authentication) throws IOException, ServletException {
 								// Do Nothing the redirection is handled by the SPA.
 							}
 						})
 						.invalidateHttpSession(true) // by default true
 				);
-		http.antMatcher("/").headers().contentSecurityPolicy("frame-ancestors " + expectedHostUrl + ";");
-		http.antMatcher("/").headers().frameOptions().disable()
-				.addHeaderWriter(
-						new StaticHeadersWriter("X-FRAME-OPTIONS", "ALLOW-FROM " + expectedHostUrl));
-
-    }
+	}
 
     @Autowired
 	CustomUserDetailsService customUserDetailsService;
@@ -79,18 +93,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-
-	// @Bean
-	// CorsConfigurationSource corsConfigurationSource() {
-	// CorsConfiguration configuration = new CorsConfiguration();
-	// configuration.setAllowedOrigins(Arrays.asList("http://localhost:4201"));
-
-	// // configuration.setAllowedOrigins(Arrays.asList(frontEndRootUrl));
-	// configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
-	// configuration.setAllowedHeaders(Arrays.asList("X-XSRF-TOKEN"));
-	// UrlBasedCorsConfigurationSource source = new
-	// UrlBasedCorsConfigurationSource();
-	// source.registerCorsConfiguration("/**", configuration);
-	// return source;
-	// }
 }
