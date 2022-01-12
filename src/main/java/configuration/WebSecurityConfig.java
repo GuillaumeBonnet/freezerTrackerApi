@@ -28,25 +28,23 @@ import org.springframework.web.cors.CorsConfiguration;
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${FRONT_END_ROOT_URL:http://localhost:8080}") // TODO!: add this var to heroku conf
+	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}")
     private String frontEndRootUrl;
 	private String expectedHostUrl = "http://localhost:4200/";
     
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-		http.cors().configurationSource(
-				request -> {
-					CorsConfiguration corsConf = new CorsConfiguration().applyPermitDefaultValues();
-					corsConf.setAllowedOrigins(List.of("http://localhost:4201"));
-					corsConf.setAllowCredentials(true);
-					corsConf.addAllowedHeader("*");
-					corsConf.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT"));
-					// exposedHeaders(HttpHeaders.SET_COOKIE).maxAge(3600L); //maxAge(3600)
-					// indicates that in 3600 seconds, there is no need to send a pre check
-					// request,
-					// and the result can be cached
-					return corsConf;
-				});
+		if (frontEndRootUrl.equals("http://localhost:8080")) {
+			http.cors().configurationSource(
+					request -> {
+						CorsConfiguration corsConf = new CorsConfiguration().applyPermitDefaultValues();
+						corsConf.setAllowedOrigins(List.of(expectedHostUrl));
+						corsConf.setAllowCredentials(true);
+						corsConf.addAllowedHeader("*");
+						corsConf.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT"));
+						return corsConf;
+					});
+		}
 		http// by default uses a Bean by the name of corsConfigurationSource
 				.csrf().disable()
 				// .csrf(csrf -> csrf
