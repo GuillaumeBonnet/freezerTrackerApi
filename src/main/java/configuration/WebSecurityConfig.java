@@ -31,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}")
     private String frontEndRootUrl;
 	private String expectedHostUrl = "http://localhost:4200/";
-    
+
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 		if (frontEndRootUrl.equals("http://localhost:8080")) {
@@ -55,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						.antMatchers("/api/users/login").permitAll()
 						.antMatchers("/api/**").authenticated()
 						.antMatchers("/**").permitAll())
+
 				.headers(headers -> {
 					headers.contentSecurityPolicy("frame-ancestors " +
 							expectedHostUrl + ";");
