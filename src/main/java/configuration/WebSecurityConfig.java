@@ -30,7 +30,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${FRONT_END_ROOT_URL:http://localhost:8080}")
     private String frontEndRootUrl;
-	private String expectedHostUrl = "http://localhost:4201";
+	@Value("${IFRAME_HOST_URL:http://localhost:4201}")
+	private String expectedHostUrl;
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
